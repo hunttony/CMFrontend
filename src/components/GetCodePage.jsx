@@ -8,7 +8,7 @@ const GetCodePage = () => {
 
   const generateTestCode = async () => {
     try {
-      const response = await axios.get('https://cmbackend.onrender.com:5000/generate-test-code');
+      const response = await axios.get('https://cmbackend.onrender.com/generate-test-code');
       setTestCode(response.data.code);
     } catch (error) {
       console.error('Error generating test code:', error);
