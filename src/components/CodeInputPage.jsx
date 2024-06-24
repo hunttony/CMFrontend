@@ -14,7 +14,7 @@ const CodeInputPage = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.get(`https://cmbackend.onrender.com/verify-code/${code}`);
+      const response = await axios.get(`https://cmbackend.onrender.com:5000/verify-code/${code}`);
       if (response.data === 'Code is valid') {
         setRedirectToMain(true);
       } else {
