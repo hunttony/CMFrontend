@@ -1,5 +1,4 @@
-// src/App.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import NSFWWarning from './components/NSFWWarning';
@@ -10,9 +9,14 @@ import MainPage from './pages/MainPage';
 import ImagePage from './pages/ImagePage';
 import SuccessPage from './pages/SuccessPage';
 import CancelPage from './pages/CancelPage';
+import ProfilePage from './pages/ProfilePage';
+import ProfileCreatorPage from './pages/ProfileCreatorPage';
+import ProfileViewerEntry from './pages/ProfileViewerEntry';
 
 const App = () => {
   const [page, setPage] = useState('warning');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState('');
 
   const handleContinue = () => {
     setPage('video');
@@ -29,9 +33,17 @@ const App = () => {
   const handleCodeSubmit = async (code) => {
     console.log('Code entered:', code);
     try {
-      const response = await axios.get(`/verify-code/${code}`);
-      if (response.data === 'Code is valid') {
-        setPage('main');
+      const response = await axios.get(`http://localhost:5000/verify-code/${code}`, { withCredentials: true });
+      if (response.data.message === 'Code is valid') {
+        setIsAuthenticated(true);
+        setRole(response.data.role);
+        if (response.data.role === 'viewer') {
+          setPage('main');
+        } else if (response.data.role === 'creator') {
+          setPage('profile-creator');
+        } else {
+          alert('Invalid role. Please contact support.');
+        }
       } else {
         alert('Invalid or expired code. Please try again.');
       }
@@ -40,6 +52,26 @@ const App = () => {
       alert('An error occurred. Please try again later.');
     }
   };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/verify-session', { withCredentials: true });
+        if (response.data.loggedIn) {
+          setIsAuthenticated(true);
+          setRole(response.data.role);
+          if (response.data.role === 'viewer') {
+            setPage('main');
+          } else if (response.data.role === 'creator') {
+            setPage('profile-creator');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+    checkSession();
+  }, []);
 
   return (
     <Router>
@@ -51,15 +83,21 @@ const App = () => {
             <VideoPage onVideoEnd={handleVideoEnd} />
           ) : page === 'codeInput' ? (
             <CodeInputPage onSubmit={handleCodeSubmit} />
+          ) : page === 'get-code' ? (
+            <GetCodePage />
           ) : (
-            <Navigate to="/main" />
+            <Navigate to={`${page}`} />
           )
         } />
+        <Route path="/codeInput" element={<CodeInputPage onSubmit={handleCodeSubmit} />} />
         <Route path="/get-code" element={<GetCodePage />} />
-        <Route path="/main" element={<MainPage />} />
+        <Route path="/main" element={isAuthenticated && role === 'viewer' ? <MainPage role={role} /> : <Navigate to="/codeInput" />} />
         <Route path="/image/:id" element={<ImagePage />} />
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/cancel" element={<CancelPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile-creator" element={isAuthenticated && role === 'creator' ? <ProfileCreatorPage  role={role}/> : <Navigate to="/codeInput" />} />
+        <Route path="/profile-viewer-entry" element={<ProfileViewerEntry />} />
       </Routes>
     </Router>
   );

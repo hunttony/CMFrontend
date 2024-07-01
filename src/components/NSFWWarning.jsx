@@ -16,6 +16,9 @@ const NSFWWarning = ({ onContinue, onEscape }) => {
       color="white"
       textAlign="center"
     >
+      <Typography variant="h2" gutterBottom>
+                <img src="https://cm-storage.s3.us-east-2.amazonaws.com/Christine+Mingles-red.svg" alt="Khrez Mingles" style={{ width: '300px' }}/>
+      </Typography>
       <Typography variant="h4" gutterBottom>
         NSFW Content Warning
       </Typography>

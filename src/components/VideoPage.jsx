@@ -11,7 +11,7 @@ const VideoPage = ({ onVideoEnd }) => {
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
       <video 
-        src="https://drive.google.com/uc?export=view&id=1H1v_1iqm_sLCSUKTlvDbY83XyYgR9tDz" 
+        src="https://cm-storage.s3.us-east-2.amazonaws.com/bkgnd.mp4" 
         autoPlay 
         muted 
         style={{ width: '100%', height: '100%', objectFit: 'cover' }}

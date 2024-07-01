@@ -4,9 +4,9 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Link, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CodeInputPage = () => {
+const CodeInputPage = ({ onSubmit }) => {
   const [code, setCode] = useState('');
-  const [redirectToMain, setRedirectToMain] = useState(false);
+  const [redirectPath, setRedirectPath] = useState(null);
 
   const handleChange = (e) => {
     setCode(e.target.value);
@@ -14,9 +14,16 @@ const CodeInputPage = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.get(`https://cmbackend.onrender.com/verify-code/${code}`);
-      if (response.data === 'Code is valid') {
-        setRedirectToMain(true);
+      const response = await axios.get(`https://cmbackend.vercel.app/api/verify-code/${code}`, { withCredentials: true });
+      if (response.data.message === 'Code is valid') {
+        const role = response.data.role;
+        if (role === 'viewer') {
+          setRedirectPath('/main');
+        } else if (role === 'creator') {
+          setRedirectPath('/profile-creator');
+        } else {
+          alert('Invalid role. Please contact support.');
+        }
       } else {
         alert('Invalid or expired code. Please try again.');
       }
@@ -26,8 +33,8 @@ const CodeInputPage = () => {
     }
   };
 
-  if (redirectToMain) {
-    return <Navigate to="/main" />;
+  if (redirectPath) {
+    return <Navigate to={redirectPath} />;
   }
 
   return (
@@ -39,9 +46,11 @@ const CodeInputPage = () => {
       height="100vh"
       width="100vw"
       bgcolor="black"
+      
       color="white"
       p={2}
     >
+      <Typography><img src="https://cm-storage.s3.us-east-2.amazonaws.com/Christine+Mingles-red.svg" alt="Khrez Mingles" style={{ width: '300px', marginBottom: '100px'}}/></Typography>
       <Typography variant="h4" gutterBottom>
         Enter Your Code
       </Typography>
