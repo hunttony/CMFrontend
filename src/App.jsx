@@ -23,6 +23,7 @@ const App = () => {
   };
 
   const handleEscape = () => {
+    
     window.location.href = 'https://www.google.com';
   };
 
@@ -33,7 +34,8 @@ const App = () => {
   const handleCodeSubmit = async (code) => {
     console.log('Code entered:', code);
     try {
-      const response = await axios.get(`http://localhost:5000/verify-code/${code}`, { withCredentials: true });
+      const response = await axios.get(`https://cmbackend.vercel.app/verify-code/${code}`, { withCredentials: true });
+      console.log('Response from backend:', response);
       if (response.data.message === 'Code is valid') {
         setIsAuthenticated(true);
         setRole(response.data.role);
@@ -56,7 +58,8 @@ const App = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/verify-session', { withCredentials: true });
+        const response = await axios.get('https://cmbackend.vercel.app/verify-session', { withCredentials: true });
+        console.log('Session check response:', response);
         if (response.data.loggedIn) {
           setIsAuthenticated(true);
           setRole(response.data.role);
@@ -73,6 +76,12 @@ const App = () => {
     checkSession();
   }, []);
 
+  useEffect(() => {
+    console.log('isAuthenticated:', isAuthenticated);
+    console.log('role:', role);
+    console.log('page:', page);
+  }, [isAuthenticated, role, page]);
+
   return (
     <Router>
       <Routes>
@@ -86,7 +95,7 @@ const App = () => {
           ) : page === 'get-code' ? (
             <GetCodePage />
           ) : (
-            <Navigate to={`${page}`} />
+            <Navigate to={`/${page}`} />
           )
         } />
         <Route path="/codeInput" element={<CodeInputPage onSubmit={handleCodeSubmit} />} />
@@ -96,7 +105,7 @@ const App = () => {
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/cancel" element={<CancelPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/profile-creator" element={isAuthenticated && role === 'creator' ? <ProfileCreatorPage  role={role}/> : <Navigate to="/codeInput" />} />
+        <Route path="/profile-creator" element={isAuthenticated && role === 'creator' ? <ProfileCreatorPage role={role}/> : <Navigate to="/codeInput" />} />
         <Route path="/profile-viewer-entry" element={<ProfileViewerEntry />} />
       </Routes>
     </Router>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TextField, Button, Box, Typography, MenuItem, Select } from '@mui/material';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
 
 const FormContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -251,6 +252,10 @@ const ProfileCreatorPage = () => {
       </PreviewContainer>
     </Box>
   );
+};
+
+ProfileCreatorPage.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default ProfileCreatorPage;
